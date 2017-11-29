@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "predeploy": "npm run build",
+    "preparedist": "cross-env NODE_ENV=production mkdir -p dist/dist && find dist -maxdepth 1 -type f -exec mv {} dist/dist ; && cp index.html dist/",
+    "predeploy": "npm run build && npm run preparedist",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
