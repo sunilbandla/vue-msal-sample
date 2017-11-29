@@ -2,7 +2,7 @@
   "name": "vue-msal-sample",
   "description": "A Vue.js project",
   "version": "1.0.0",
-  "author": "Sunil B <suband@microsoft.com>",
+  "author": "Sunil B",
   "license": "MIT",
   "private": true,
   "scripts": {
