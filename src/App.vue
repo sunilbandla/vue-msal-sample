@@ -2,31 +2,82 @@
   <div id="app">
     <img src="./assets/logo.png">
     <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <button @click="login" type="button" v-if="!user">Login with Microsoft</button>
+    <button @click="callAPI" type="button" v-if="user">
+      Call Graph's /me API
+    </button>
+    <button @click="logout" type="button" v-if="user">
+      Logout
+    </button>
+    <h3 v-if="user">Hello {{ user.name }}</h3>
+    <pre v-if="userInfo">{{ JSON.stringify(userInfo, null, 4) }}</pre>
+    <p v-if="loginFailed">Login unsuccessful</p>
+    <p v-if="apiCallFailed">Graph API call unsuccessful</p>
   </div>
 </template>
 
 <script>
+import AuthService from './services/auth.service';
+import GraphService from './services/graph.service';
+
 export default {
   name: 'app',
-  data () {
+  data() {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js + MSAL.js App',
+      user: null,
+      userInfo: null,
+      apiCallFailed: false,
+      loginFailed: false
+    }
+  },
+  created() {
+    this.authService = new AuthService();
+    this.graphService = new GraphService();
+  },
+  methods: {
+    callAPI() {
+      this.apiCallFailed = false;
+      this.authService.getToken().then(
+        token => {
+          this.graphService.getUserInfo(token).then(
+            data => {
+              this.userInfo = data;
+            },
+            error => {
+              console.error(error);
+              this.apiCallFailed = true;
+            }
+          );
+        },
+        error => {
+          console.error(error);
+          this.apiCallFailed = true;
+        }
+      );
+    },
+
+    logout() {
+      this.authService.logout();
+    },
+
+    login() {
+      this.loginFailed = false;
+      this.authService.login().then(
+        user => {
+          if (user) {
+            this.user = user;
+          } else {
+            this.loginFailed = true;
+          }
+        },
+        () => {
+          this.loginFailed = true;
+        }
+      );
     }
   }
+
 }
 </script>
 
@@ -40,7 +91,8 @@ export default {
   margin-top: 60px;
 }
 
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 
@@ -56,5 +108,9 @@ li {
 
 a {
   color: #42b983;
+}
+
+button {
+  margin: 15px;
 }
 </style>
