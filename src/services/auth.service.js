@@ -20,7 +20,7 @@ export default class AuthService {
   login() {
     return this.app.loginPopup(this.requestObj).then(
       idToken => {
-        const user = idToken.idToken;
+        const user = this.app.getAccount();
         if (user) {
           return user;
         } else {
@@ -34,6 +34,13 @@ export default class AuthService {
   };
   logout() {
     this.app.logout();
+  };
+  getAccount(){
+    if (this.app.getAccount()) {
+            return this.app.getAccount();
+        } else {
+            return false;
+        }
   };
   getToken() {
     return this.app.acquireTokenSilent(this.requestObj).then(

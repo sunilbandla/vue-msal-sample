@@ -35,6 +35,12 @@ export default {
     this.authService = new AuthService();
     this.graphService = new GraphService();
   },
+  mounted() {
+    let account = this.authService.getAccount();
+    if(account){
+      this.user = account;
+    }
+  },
   methods: {
     callAPI() {
       this.apiCallFailed = false;
